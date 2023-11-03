@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
+	"log"
 	"net/http"
 )
 
@@ -29,17 +30,19 @@ func createOwner(writer http.ResponseWriter, request *http.Request) {
 
 	db, err := sql.Open("sqlite3", "./barbar.db")
 	if err != nil {
+		log.Println(err.Error())
 		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte("Internal server error"))
+		writer.Write([]byte("err"))
 		return
 
 	}
 	defer db.Close()
 
-	prepare, err := db.Prepare("INSERT INTO owners (username, email, password, phone) VALUES (?, ?, ?, ?)")
+	prepare, err := db.Prepare("INSERT INTO owner (username, email, passkey, phone) VALUES (?, ?, ?, ?)")
 	if err != nil {
+		log.Println(err.Error())
 		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte("Internal server error"))
+		writer.Write([]byte(err.Error()))
 		return
 	}
 	prepare.Exec(owner.Username, owner.Email, owner.Password, owner.Phone)

@@ -34,6 +34,8 @@ func createService(w http.ResponseWriter, r *http.Request) {
 	return
 }
 func listServices(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	//sql query to list all services
 	db, err := sql.Open("sqlite3", "./barbar.db")
 	if err != nil {
@@ -47,14 +49,13 @@ func listServices(w http.ResponseWriter, r *http.Request) {
 	// select * from services where owner_id = owner_id
 	// left join
 
-	rows, err := db.Query("SELECT * FROM services where owner_id = ?")
+	rows, err := db.Query("SELECT * FROM services")
 	for rows.Next() {
 		var service model.Service
 		err = rows.Scan(&service.ServiceID, &service.ServiceName, &service.Description, &service.Duration, &service.Price)
 		if err != nil {
 			log.Default().Println(err)
 		}
-		err = json.NewEncoder(w).Encode(service)
 		if err != nil {
 			log.Default().Println(err)
 		}
@@ -72,6 +73,8 @@ func listServices(w http.ResponseWriter, r *http.Request) {
 	return
 }
 func getService(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	//sql query to get a service
 	db, err := sql.Open("sqlite3", "./barbar.db")
 	if err != nil {
