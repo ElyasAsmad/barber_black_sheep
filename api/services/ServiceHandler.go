@@ -1,6 +1,7 @@
 package services
 
 import (
+	"barber_black_sheep/data"
 	"barber_black_sheep/model"
 	"database/sql"
 	"encoding/json"
@@ -18,7 +19,7 @@ func MakeHTTPHandler() http.Handler {
 func GetService(writer http.ResponseWriter, request *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
 	res := chi.URLParam(request, "id")
-	db, err := sql.Open("sqlite3", "./barbar.db")
+	db, err := sql.Open("sqlite3", data.DB_CONN_STRING)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		writer.Write([]byte("err"))
@@ -54,7 +55,7 @@ func GetService(writer http.ResponseWriter, request *http.Request) {
 
 func GetAllServices(writer http.ResponseWriter, request *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
-	db, err := sql.Open("sqlite3", "./barbar.db")
+	db, err := sql.Open("sqlite3", data.DB_CONN_STRING)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		writer.Write([]byte("err"))

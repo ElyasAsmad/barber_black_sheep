@@ -1,11 +1,11 @@
 package owner
 
 import (
+	"barber_black_sheep/data"
 	"barber_black_sheep/model"
 	"database/sql"
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"log"
 	"net/http"
 )
@@ -13,7 +13,6 @@ import (
 // chi http handler routes for owners
 func MakeHTTPHandler() http.Handler {
 	r := chi.NewRouter()
-	r.Use(middleware.BasicAuth("admin", map[string]string{"admin": "admin"}))
 	r.Get("/", listOwners)
 	r.Get("/{owner_id}", getOwner)
 	r.Post("/", createOwner)
@@ -30,7 +29,7 @@ func createOwner(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	db, err := sql.Open("sqlite3", "./barbar.db")
+	db, err := sql.Open("sqlite3", data.DB_CONN_STRING)
 	if err != nil {
 		log.Println(err.Error())
 		writer.WriteHeader(http.StatusInternalServerError)

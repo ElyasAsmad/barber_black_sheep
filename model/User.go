@@ -1,6 +1,7 @@
 package model
 
 import (
+	"barber_black_sheep/data"
 	"database/sql"
 	"errors"
 	"golang.org/x/crypto/bcrypt"
@@ -21,19 +22,14 @@ func HashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 func CreateUser(user *User) error {
-	//open database
-	// defer db.Close()
-	//hash password
-	//prepare statement
-	//execute statement
-	//return nil or error
+
 	log.Default().Println(user.Username, user.Email, user.Password, user.Phone, user.Role)
 	existUser := GetUserByUsername(user.Username)
 	if existUser != nil {
 		log.Println(existUser.Username)
 		return errors.New("user already exists")
 	}
-	db, err := sql.Open("sqlite3", "./barbar.db?_busy_timeout=5000")
+	db, err := sql.Open("sqlite3", data.DB_CONN_STRING)
 	if err != nil {
 		log.Println(err.Error())
 		return err
@@ -55,7 +51,7 @@ func CreateUser(user *User) error {
 // if user exists, return user
 // if user does not exist, return nil
 func GetUserByUsername(username string) *User {
-	db, err := sql.Open("sqlite3", "./barbar.db?_busy_timeout=5000")
+	db, err := sql.Open("sqlite3", data.DB_CONN_STRING)
 	if err != nil {
 		log.Println(err.Error())
 		return nil

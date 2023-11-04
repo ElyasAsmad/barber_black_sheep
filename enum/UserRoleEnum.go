@@ -1,8 +1,10 @@
 package enum
 
 // role enum
+type UserRoleEnum int
+
 const (
-	Admin = 0
-	Owner = 1
-	User  = 2
+	Admin UserRoleEnum = iota
+	Owner
+	User
 )

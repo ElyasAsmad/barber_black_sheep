@@ -2,12 +2,15 @@ package helpers
 
 import (
 	"barber_black_sheep/model"
+	"github.com/go-chi/jwtauth/v5"
 	"github.com/golang-jwt/jwt/v5"
 	"strconv"
 	"time"
 )
 
 var privateKey = []byte("SOME_SECRET_KEY")
+
+var TokenAuth = jwtauth.New("HS256", privateKey, nil)
 
 func GenerateJWT(user model.User) (string, error) {
 	tokenTTL, _ := strconv.Atoi("86400")

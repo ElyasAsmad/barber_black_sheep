@@ -1,6 +1,7 @@
 package owner_appointment
 
 import (
+	"barber_black_sheep/data"
 	"barber_black_sheep/model"
 	"database/sql"
 	"encoding/json"
@@ -23,7 +24,7 @@ func UpdateAppointment(writer http.ResponseWriter, request *http.Request) {
 func GetAppointment(writer http.ResponseWriter, request *http.Request) {
 	// get appointment by id
 	res := chi.URLParam(request, "id")
-	db, err := sql.Open("sqlite3", "./barbar.db")
+	db, err := sql.Open("sqlite3", data.DB_CONN_STRING)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		writer.Write([]byte(err.Error()))
@@ -49,7 +50,7 @@ func GetAppointment(writer http.ResponseWriter, request *http.Request) {
 func GetAllAppointments(writer http.ResponseWriter, request *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
 	// get all appointments
-	db, err := sql.Open("sqlite3", "./barbar.db")
+	db, err := sql.Open("sqlite3", data.DB_CONN_STRING)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		writer.Write([]byte(err.Error()))

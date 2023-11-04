@@ -28,7 +28,7 @@ func Register(writer http.ResponseWriter, request *http.Request) {
 		writer.Write([]byte("Bad request"))
 		return
 	}
-	user.Role = strconv.Itoa(enum.User)
+	user.Role = strconv.Itoa(int(enum.User))
 	err = model.CreateUser(&user)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)

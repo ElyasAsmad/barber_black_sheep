@@ -1,6 +1,7 @@
 package user
 
 import (
+	"barber_black_sheep/data"
 	"barber_black_sheep/enum"
 	"barber_black_sheep/model"
 	"database/sql"
@@ -12,6 +13,8 @@ import (
 
 func MakeHTTPHandler() http.Handler {
 	r := chi.NewRouter()
+	/*	r.Use(jwtauth.Verifier(helpers.TokenAuth))
+		r.Use(jwtauth.Authenticator)*/
 	r.Get("/", listUsers)
 	r.Get("/{user_id}", getUser)
 	r.Post("/", createUser)
@@ -27,13 +30,14 @@ func createUser(writer http.ResponseWriter, request *http.Request) {
 		writer.Write([]byte("Bad request"))
 		return
 	}
+
 	switch user.Role {
 	case "admin":
-		user.Role = strconv.Itoa(enum.Admin)
+		user.Role = strconv.Itoa(int(enum.Admin))
 	case "owner":
-		user.Role = strconv.Itoa(enum.Owner)
+		user.Role = strconv.Itoa(int(enum.Owner))
 	default:
-		user.Role = strconv.Itoa(enum.User)
+		user.Role = strconv.Itoa(int(enum.User))
 	}
 	err = model.CreateUser(&user)
 	if err != nil {
@@ -46,7 +50,7 @@ func createUser(writer http.ResponseWriter, request *http.Request) {
 }
 
 func listUsers(writer http.ResponseWriter, request *http.Request) {
-	db, err := sql.Open("sqlite3", "./barbar.db")
+	db, err := sql.Open("sqlite3", data.DB_CONN_STRING)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		writer.Write([]byte("err"))
@@ -83,7 +87,7 @@ func listUsers(writer http.ResponseWriter, request *http.Request) {
 func getUser(writer http.ResponseWriter, request *http.Request) {
 	//chi url param
 	userID := chi.URLParam(request, "user_id")
-	db, err := sql.Open("sqlite3", "./barbar.db")
+	db, err := sql.Open("sqlite3", data.DB_CONN_STRING)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		writer.Write([]byte("err"))

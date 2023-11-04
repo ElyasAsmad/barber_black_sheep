@@ -1,6 +1,7 @@
 package owner_services
 
 import (
+	"barber_black_sheep/data"
 	"barber_black_sheep/model"
 	"database/sql"
 	"encoding/json"
@@ -18,7 +19,7 @@ func createService(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	db, err := sql.Open("sqlite3", "./barbar.db")
+	db, err := sql.Open("sqlite3", data.DB_CONN_STRING)
 	if err != nil {
 		log.Default().Println(err)
 	}
@@ -37,7 +38,7 @@ func listServices(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	//sql query to list all owner_services
-	db, err := sql.Open("sqlite3", "./barbar.db")
+	db, err := sql.Open("sqlite3", data.DB_CONN_STRING)
 	if err != nil {
 		log.Default().Println(err)
 	}
@@ -76,7 +77,7 @@ func getService(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	//sql query to get a service
-	db, err := sql.Open("sqlite3", "./barbar.db")
+	db, err := sql.Open("sqlite3", data.DB_CONN_STRING)
 	if err != nil {
 		log.Default().Println(err)
 	}
