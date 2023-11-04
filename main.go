@@ -1,6 +1,7 @@
 package main
 
 import (
+	"barber_black_sheep/api/login"
 	"barber_black_sheep/api/owner"
 	"barber_black_sheep/api/owner_appointment"
 	"barber_black_sheep/api/owner_services"
@@ -27,10 +28,7 @@ func main() {
 	r.Mount("/api/v1/admin/users", user.MakeHTTPHandler())
 	r.Mount("/api/v1/appointments", user_appointment.MakeHttpHandler())
 	r.Mount("/api/v1/services", services.MakeHTTPHandler())
-	r.Group(func(r chi.Router) {
-		r.Post("/login", func(w http.ResponseWriter, r *http.Request) {})
-		r.Post("/logout", func(w http.ResponseWriter, r *http.Request) {})
-	})
+	r.Mount("/api/v1/account", login.MakeHTTPHandler())
 	err := http.ListenAndServe(":8080", r)
 	if err != nil {
 		log.Default().Println(err)

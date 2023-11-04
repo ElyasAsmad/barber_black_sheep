@@ -1,11 +1,13 @@
 package user
 
 import (
+	"barber_black_sheep/enum"
 	"barber_black_sheep/model"
 	"database/sql"
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"net/http"
+	"strconv"
 )
 
 func MakeHTTPHandler() http.Handler {
@@ -25,24 +27,21 @@ func createUser(writer http.ResponseWriter, request *http.Request) {
 		writer.Write([]byte("Bad request"))
 		return
 	}
-
-	db, err := sql.Open("sqlite3", "./barbar.db")
-	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte("err"))
-		return
+	switch user.Role {
+	case "admin":
+		user.Role = strconv.Itoa(enum.Admin)
+	case "owner":
+		user.Role = strconv.Itoa(enum.Owner)
+	default:
+		user.Role = strconv.Itoa(enum.User)
 	}
-	defer db.Close()
-
-	prepare, err := db.Prepare("INSERT INTO users (username, email, password, phone) VALUES (?, ?, ?, ?)")
+	err = model.CreateUser(&user)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		writer.Write([]byte(err.Error()))
 		return
 	}
-	prepare.Exec(user.Username, user.Email, user.Password, user.Phone)
 	writer.WriteHeader(http.StatusCreated)
-	writer.Write([]byte("User created successfully"))
 	return
 }
 
@@ -58,28 +57,23 @@ func listUsers(writer http.ResponseWriter, request *http.Request) {
 	rows, err := db.Query("SELECT * FROM users")
 	for rows.Next() {
 		var user model.User
-		err = rows.Scan(&user.UserID, &user.Username, &user.Email, &user.Password, &user.Phone)
+		err = rows.Scan(&user.UserID, &user.Username, &user.Email, &user.Password, &user.Phone, &user.Role)
 		if err != nil {
 			writer.WriteHeader(http.StatusInternalServerError)
-			writer.Write([]byte("err"))
-			return
-		}
-		if err != nil {
-			writer.WriteHeader(http.StatusInternalServerError)
-			writer.Write([]byte("err"))
+			writer.Write([]byte(err.Error()))
 			return
 		}
 		users = append(users, user)
 	}
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte("err"))
+		writer.Write([]byte(err.Error()))
 		return
 	}
 	err = json.NewEncoder(writer).Encode(users)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte("err"))
+		writer.Write([]byte(err.Error()))
 		return
 	}
 	writer.WriteHeader(http.StatusOK)
@@ -97,7 +91,7 @@ func getUser(writer http.ResponseWriter, request *http.Request) {
 	}
 	defer db.Close()
 	var user model.User
-	err = db.QueryRow("SELECT * FROM users WHERE user_id = ?", userID).Scan(&user.UserID, &user.Username, &user.Email, &user.Password, &user.Phone)
+	err = db.QueryRow("SELECT * FROM users WHERE user_id = ?", userID).Scan(&user.UserID, &user.Username, &user.Email, &user.Password, &user.Phone, &user.Role)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		writer.Write([]byte("err"))
