@@ -3,18 +3,20 @@ package user
 import (
 	"barber_black_sheep/data"
 	"barber_black_sheep/enum"
+	"barber_black_sheep/helpers"
 	"barber_black_sheep/model"
 	"database/sql"
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/jwtauth/v5"
 	"net/http"
 	"strconv"
 )
 
 func MakeHTTPHandler() http.Handler {
 	r := chi.NewRouter()
-	/*	r.Use(jwtauth.Verifier(helpers.TokenAuth))
-		r.Use(jwtauth.Authenticator)*/
+	r.Use(jwtauth.Verifier(helpers.TokenAuth))
+	r.Use(jwtauth.Authenticator)
 	r.Get("/", listUsers)
 	r.Get("/{user_id}", getUser)
 	r.Post("/", createUser)
