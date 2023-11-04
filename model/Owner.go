@@ -8,7 +8,7 @@ type Owner struct {
 	Phone    string `json:"phone"`
 } // Owner has many appointments
 
-// Owner has many services
+// Owner has many owner_services
 
 //turn struct into json literals
 //json literals are key value pairs

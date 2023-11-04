@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"log"
 	"net/http"
 )
@@ -12,6 +13,7 @@ import (
 // chi http handler routes for owners
 func MakeHTTPHandler() http.Handler {
 	r := chi.NewRouter()
+	r.Use(middleware.BasicAuth("admin", map[string]string{"admin": "admin"}))
 	r.Get("/", listOwners)
 	r.Get("/{owner_id}", getOwner)
 	r.Post("/", createOwner)

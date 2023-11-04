@@ -47,5 +47,32 @@ func GetAppointment(writer http.ResponseWriter, request *http.Request) {
 }
 
 func GetAllAppointments(writer http.ResponseWriter, request *http.Request) {
-
+	writer.Header().Set("Content-Type", "application/json")
+	// get all appointments
+	db, err := sql.Open("sqlite3", "./barbar.db")
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write([]byte(err.Error()))
+		return
+	}
+	defer db.Close()
+	var appointments []model.Appointment
+	rows, err := db.Query("SELECT * FROM appointments")
+	for rows.Next() {
+		var appointment model.Appointment
+		err = rows.Scan(&appointment.AppointmentID, &appointment.ServiceID, &appointment.UserID, &appointment.Date, &appointment.Time)
+		if err != nil {
+			writer.WriteHeader(http.StatusInternalServerError)
+			writer.Write([]byte(err.Error()))
+			return
+		}
+		appointments = append(appointments, appointment)
+	}
+	err = json.NewEncoder(writer).Encode(appointments)
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write([]byte(err.Error()))
+		return
+	}
+	return
 }

@@ -5,99 +5,85 @@ import (
 	"database/sql"
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
-	"log"
 	"net/http"
 )
 
-func createService(w http.ResponseWriter, r *http.Request) {
-	var service model.Service
-
-	err := json.NewDecoder(r.Body).Decode(&service)
-	if err != nil {
-		log.Default().Println(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	db, err := sql.Open("sqlite3", "./barbar.db")
-	if err != nil {
-		log.Default().Println(err)
-	}
-	defer db.Close()
-	prepare, err := db.Prepare("INSERT INTO services (service_name, description, duration, price) VALUES (?, ?, ?, ?)")
-	if err != nil {
-		return
-	}
-	prepare.Exec(service.ServiceName, service.Description, service.Duration, service.Price)
-	w.WriteHeader(http.StatusCreated)
-	log.Print("Service created successfully")
-	//sql query to create a service
-	return
+func MakeHTTPHandler() http.Handler {
+	r := chi.NewRouter()
+	r.Get("/", GetAllServices)
+	r.Get("/{id}", GetService)
+	return r
 }
-func listServices(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 
-	//sql query to list all services
+func GetService(writer http.ResponseWriter, request *http.Request) {
+	writer.Header().Set("Content-Type", "application/json")
+	res := chi.URLParam(request, "id")
 	db, err := sql.Open("sqlite3", "./barbar.db")
 	if err != nil {
-		log.Default().Println(err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write([]byte("err"))
+		return
 	}
 	defer db.Close()
-	//new slice
-	var services []model.Service
-	//query
-	// services from where owner_id = owner_id left join services on services.service_id = service_owner.service_id
-	// select * from services where owner_id = owner_id
-	// left join
+	var service model.Service
+	rows, err := db.Query("SELECT * FROM services WHERE service_id = ?", res)
+	for rows.Next() {
+		err = rows.Scan(&service.ServiceID, &service.ServiceName, &service.Description, &service.Duration, &service.Price)
+		if err != nil {
+			writer.WriteHeader(http.StatusInternalServerError)
+			writer.Write([]byte("err"))
+			return
+		}
 
+	}
+	err = rows.Err()
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write([]byte(err.Error()))
+		return
+	}
+	if service.ServiceID == 0 {
+		writer.WriteHeader(http.StatusNotFound)
+		writer.Write([]byte("Service not found"))
+		return
+	} else {
+		json.NewEncoder(writer).Encode(service)
+		return
+	}
+}
+
+func GetAllServices(writer http.ResponseWriter, request *http.Request) {
+	writer.Header().Set("Content-Type", "application/json")
+	db, err := sql.Open("sqlite3", "./barbar.db")
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write([]byte("err"))
+		return
+	}
+	defer db.Close()
+	var services []model.Service
 	rows, err := db.Query("SELECT * FROM services")
 	for rows.Next() {
 		var service model.Service
 		err = rows.Scan(&service.ServiceID, &service.ServiceName, &service.Description, &service.Duration, &service.Price)
 		if err != nil {
-			log.Default().Println(err)
-		}
-		if err != nil {
-			log.Default().Println(err)
+			writer.WriteHeader(http.StatusInternalServerError)
+			writer.Write([]byte("err"))
+			return
 		}
 		services = append(services, service)
 	}
-
+	err = rows.Err()
 	if err != nil {
-		log.Default().Println(err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write([]byte(err.Error()))
+		return
 	}
-
-	err = json.NewEncoder(w).Encode(services)
+	err = json.NewEncoder(writer).Encode(services)
 	if err != nil {
-		log.Default().Println(err)
-	}
-	return
-}
-func getService(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	//sql query to get a service
-	db, err := sql.Open("sqlite3", "./barbar.db")
-	if err != nil {
-		log.Default().Println(err)
-	}
-	defer db.Close()
-	var service model.Service
-	serviceID := chi.URLParam(r, "service_id")
-	err = db.QueryRow("SELECT * FROM services WHERE service_id = ?", serviceID).Scan(&service.ServiceID, &service.ServiceName, &service.Description, &service.Duration, &service.Price)
-	if err != nil {
-		log.Default().Println(err)
-	}
-	err = json.NewEncoder(w).Encode(service)
-	if err != nil {
-		log.Default().Println(err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write([]byte("err"))
+		return
 	}
 	return
-}
-
-func MakeHTTPHandler() http.Handler {
-	r := chi.NewRouter()
-	r.Post("/", createService)
-	r.Get("/", listServices)
-	r.Get("/{service_id}", getService)
-	return r
 }
