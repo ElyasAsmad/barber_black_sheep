@@ -1,4 +1,4 @@
-package owner
+package admin_owner
 
 import (
 	"barber_black_sheep/data"
@@ -6,7 +6,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/jwtauth/v5"
 	"log"
 	"net/http"
 )
@@ -14,7 +13,6 @@ import (
 // chi http handler routes for owners
 func MakeHTTPHandler() http.Handler {
 	r := chi.NewRouter()
-	r.Use(jwtauth.Authenticator)
 	r.Get("/", listOwners)
 	r.Get("/{owner_id}", getOwner)
 	r.Post("/", createOwner)

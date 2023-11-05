@@ -1,4 +1,4 @@
-package login
+package public_login
 
 import (
 	"barber_black_sheep/enum"

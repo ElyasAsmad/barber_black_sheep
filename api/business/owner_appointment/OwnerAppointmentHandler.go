@@ -1,4 +1,4 @@
-package owner_appointment
+package business_appointment
 
 import (
 	"barber_black_sheep/data"

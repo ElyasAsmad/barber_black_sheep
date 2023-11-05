@@ -1,4 +1,4 @@
-package services
+package user_services
 
 import (
 	"barber_black_sheep/data"

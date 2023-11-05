@@ -1,4 +1,4 @@
-package owner_services
+package admin_owner_services
 
 import (
 	"barber_black_sheep/data"
