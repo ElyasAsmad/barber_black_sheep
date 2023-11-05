@@ -29,7 +29,7 @@ func main() {
 	r.Mount("/api/v1/appointments", user_appointment.MakeHttpHandler())
 	r.Mount("/api/v1/services", services.MakeHTTPHandler())
 	r.Mount("/api/v1/account", login.MakeHTTPHandler())
-	err := http.ListenAndServe(":8080", r)
+	err := http.ListenAndServe("127.0.0.1:8080", r)
 	if err != nil {
 		log.Default().Println(err)
 	}
