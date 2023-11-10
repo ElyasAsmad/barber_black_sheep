@@ -37,7 +37,7 @@ func main() {
 		AllowCredentials: false,
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
-	r.Mount("/api/v1/business/owner_services", business_service.MakeHTTPHandler())
+	r.Mount("/api/v1/business/services", business_service.MakeHTTPHandler())
 	r.Mount("/api/v1/business/appointments", business_appointment.MakeHttpHandler())
 	r.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(helpers.TokenAuth))
