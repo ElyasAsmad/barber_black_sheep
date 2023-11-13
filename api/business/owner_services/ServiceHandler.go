@@ -5,9 +5,10 @@ import (
 	"barber_black_sheep/model"
 	"database/sql"
 	"encoding/json"
-	"github.com/go-chi/chi/v5"
 	"log"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
 )
 
 func createService(w http.ResponseWriter, r *http.Request) {
@@ -50,7 +51,7 @@ func listServices(w http.ResponseWriter, r *http.Request) {
 	// select * from owner_services where owner_id = owner_id
 	// left join
 
-	rows, err := db.Query("SELECT * FROM owner_services")
+	rows, err := db.Query("SELECT * FROM services")
 	for rows.Next() {
 		var service model.Service
 		err = rows.Scan(&service.ServiceID, &service.ServiceName, &service.Description, &service.Duration, &service.Price)
