@@ -1,13 +1,12 @@
 package public_login
 
 import (
-	"barber_black_sheep/enum"
 	"barber_black_sheep/helpers"
 	"barber_black_sheep/model"
 	"encoding/json"
-	"github.com/go-chi/chi/v5"
 	"net/http"
-	"strconv"
+
+	"github.com/go-chi/chi/v5"
 )
 
 //chi router login
@@ -28,7 +27,7 @@ func Register(writer http.ResponseWriter, request *http.Request) {
 		writer.Write([]byte("Bad request"))
 		return
 	}
-	user.Role = strconv.Itoa(int(enum.User))
+	// user.Role = strconv.Itoa(int(enum.User))
 	err = model.CreateUser(&user)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)

@@ -2,13 +2,12 @@ package admin_user
 
 import (
 	"barber_black_sheep/data"
-	"barber_black_sheep/enum"
 	"barber_black_sheep/model"
 	"database/sql"
 	"encoding/json"
-	"github.com/go-chi/chi/v5"
 	"net/http"
-	"strconv"
+
+	"github.com/go-chi/chi/v5"
 )
 
 func MakeHTTPHandler() http.Handler {
@@ -29,14 +28,14 @@ func createUser(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	switch user.Role {
-	case "admin":
-		user.Role = strconv.Itoa(int(enum.Admin))
-	case "owner":
-		user.Role = strconv.Itoa(int(enum.Owner))
-	default:
-		user.Role = strconv.Itoa(int(enum.User))
-	}
+	// switch user.Role {
+	// case "admin":
+	// 	user.Role = strconv.Itoa(int(enum.Admin))
+	// case "owner":
+	// 	user.Role = strconv.Itoa(int(enum.Owner))
+	// default:
+	// 	user.Role = strconv.Itoa(int(enum.User))
+	// }
 	err = model.CreateUser(&user)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -59,7 +58,7 @@ func listUsers(writer http.ResponseWriter, request *http.Request) {
 	rows, err := db.Query("SELECT * FROM users")
 	for rows.Next() {
 		var user model.User
-		err = rows.Scan(&user.UserID, &user.Username, &user.Email, &user.Password, &user.Phone, &user.Role)
+		err = rows.Scan(&user.UserID, &user.Username, &user.Email, &user.Password, &user.Phone)
 		if err != nil {
 			writer.WriteHeader(http.StatusInternalServerError)
 			writer.Write([]byte(err.Error()))
@@ -93,7 +92,7 @@ func getUser(writer http.ResponseWriter, request *http.Request) {
 	}
 	defer db.Close()
 	var user model.User
-	err = db.QueryRow("SELECT * FROM users WHERE user_id = ?", userID).Scan(&user.UserID, &user.Username, &user.Email, &user.Password, &user.Phone, &user.Role)
+	err = db.QueryRow("SELECT * FROM users WHERE user_id = ?", userID).Scan(&user.UserID, &user.Username, &user.Email, &user.Password, &user.Phone)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		writer.Write([]byte("err"))
