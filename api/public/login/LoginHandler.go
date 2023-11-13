@@ -69,8 +69,13 @@ func Login(writer http.ResponseWriter, request *http.Request) {
 		writer.Write([]byte("Error generating token"))
 		return
 	}
+	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
-	writer.Write([]byte(token))
+	json.NewEncoder(writer).Encode(struct {
+		Token string `json:"token"`
+	}{
+		Token: token,
+	})
 	//some logic to check if user exists
 	//if user exists, check if password matches
 	//if password matches, create a jwt token
